@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>اشعة</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#eef2f7;color:#0f172a;line-height:1.6;padding-bottom:60px}
+#err{display:none;background:#fee2e2;color:#991b1b;padding:12px 16px;font-size:14px;direction:ltr}
+.wrap{max-width:820px;margin:0 auto;padding:0 12px}
+.hero{background:linear-gradient(135deg,#0e7490,#0891b2);color:#fff;border-radius:0 0 22px 22px;padding:28px 18px 22px;text-align:center}
+.hero h1{font-size:26px;margin-bottom:4px}
+.hero p{opacity:.9;font-size:14px}
+.hero .by{margin-top:6px;font-weight:700;letter-spacing:.04em}
+.filters{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:16px 0 6px}
+.fbtn{padding:8px 14px;border-radius:20px;border:2px solid #0e7490;background:#fff;color:#0e7490;font-weight:700;font-size:13px;cursor:pointer}
+.fbtn.active{background:#0e7490;color:#fff}
+.count{text-align:center;color:#475569;font-size:14px;margin-bottom:6px}
+.bar{position:sticky;top:0;z-index:50;background:#0f172a;color:#fff;padding:8px 12px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.bar-in{max-width:820px;margin:0 auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;font-weight:700}
+.bar .pill{background:rgba(255,255,255,.12);padding:3px 10px;border-radius:14px}
+.pg{flex:1;min-width:60px;height:6px;background:rgba(255,255,255,.2);border-radius:6px;overflow:hidden}
+.pg i{display:block;height:100%;width:0;background:#22d3ee;transition:width .3s}
+.sec{margin:26px 0 6px;text-align:center;font-weight:700;color:#0e7490;font-size:14px;background:#e0f2fe;border:1px solid #bae6fd;border-radius:12px;padding:8px 12px}
+.card{background:#fff;border-radius:16px;padding:18px 16px;margin:12px 0;box-shadow:0 2px 12px rgba(15,23,42,.08);border-right:6px solid #cbd5e1}
+.card.ok{border-right-color:#10b981}.card.no{border-right-color:#ef4444}
+.qh{display:flex;align-items:center;gap:8px;margin-bottom:10px;direction:ltr}
+.qn{background:#0e7490;color:#fff;min-width:32px;height:32px;border-radius:16px;padding:0 8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.tag{background:#e0f2fe;color:#0e7490;border-radius:12px;padding:2px 10px;font-size:12px;font-weight:700}
+.qt{font-size:16px;font-weight:700;direction:ltr;text-align:left;margin-bottom:12px}
+.fig{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:6px;margin-bottom:12px;direction:ltr}
+
+.hint{font-size:13px;color:#0e7490;margin-bottom:8px}
+.opts{display:flex;flex-direction:column;gap:8px;direction:ltr}
+.opt{display:flex;align-items:center;gap:10px;text-align:left;width:100%;padding:11px 12px;border:2px solid #e2e8f0;border-radius:12px;background:#fff;font-size:15px;cursor:pointer;color:#1e293b}
+.opt b{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:13px;background:#f1f5f9;border:2px solid #cbd5e1;font-size:12px;flex-shrink:0}
+.opt.sel{border-color:#0e7490;background:#ecfeff}
+.opt.right{border-color:#10b981;background:#ecfdf5;color:#065f46;font-weight:700}
+.opt.right b{background:#10b981;border-color:#10b981;color:#fff}
+.opt.bad{border-color:#ef4444;background:#fef2f2;color:#7f1d1d}
+.opt.bad b{background:#ef4444;border-color:#ef4444;color:#fff}
+.inp{width:100%;padding:11px 12px;border:2px solid #e2e8f0;border-radius:12px;font-size:15px;margin-bottom:8px;direction:ltr}
+.inp.ok{border-color:#10b981;background:#ecfdf5}.inp.no{border-color:#ef4444;background:#fef2f2}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.btn{padding:10px 18px;border:0;border-radius:12px;background:#0e7490;color:#fff;font-weight:700;font-size:14px;cursor:pointer}
+.btn.gh{background:#e2e8f0;color:#334155}.btn.g{background:#059669}.btn.r{background:#dc2626}
+.btn:disabled{opacity:.5;cursor:default}
+.solbox{display:none;margin-top:12px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:10px;direction:ltr;font-size:14px}
+.solbox .ans{font-weight:700;color:#0e7490;border-bottom:1px dashed #bae6fd;padding-bottom:6px;margin-bottom:6px}
+.grade{display:none;margin-top:10px}
+.fb{display:none;margin-top:12px;padding:10px 12px;border-radius:10px;font-size:14px}
+.fb.ok{background:#ecfdf5;color:#065f46;border-right:4px solid #10b981}
+.fb.no{background:#fef2f2;color:#7f1d1d;border-right:4px solid #ef4444}
+.note{margin-top:6px;padding:6px 10px;background:#fffbeb;border:1px solid #fcd34d;color:#92400e;border-radius:8px}
+.sub{display:block}
+#result{display:none;background:#fff;border-radius:18px;padding:22px 16px;margin:20px 0;text-align:center;box-shadow:0 4px 20px rgba(15,23,42,.12)}
+#result h2{margin-bottom:6px}
+.big{font-size:44px;font-weight:900;color:#0e7490}
+.stats{display:flex;gap:10px;justify-content:center;margin:14px 0}
+.stat{flex:1;border-radius:12px;padding:10px;font-weight:700}
+.stat.c{background:#ecfdf5;color:#059669}.stat.w{background:#fef2f2;color:#dc2626}.stat.p{background:#fffbeb;color:#d97706}
+.rev{text-align:right;margin-top:14px}
+.ri{background:#fef2f2;border-right:4px solid #ef4444;border-radius:10px;padding:10px;margin-bottom:8px;font-size:14px}
+.ri .q{font-weight:700;direction:ltr;text-align:left}
+.sbtn{display:block;margin:20px auto 0;padding:14px 50px;font-size:16px}
+
+.qt{overflow-wrap:anywhere}
+.top{position:sticky;top:0;z-index:60;background:#0f172a;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.tabs{display:flex;max-width:820px;margin:0 auto}
+.tab{flex:1;padding:11px 4px 9px;border:0;background:transparent;color:#94a3b8;font-weight:700;font-size:13px;cursor:pointer;border-bottom:3px solid transparent;font-family:inherit}
+.tab small{display:block;font-weight:400;font-size:10.5px;opacity:.8}
+.tab.on{color:#fff;border-bottom-color:#22d3ee;background:rgba(255,255,255,.06)}
+.bar{position:static;box-shadow:none;padding:6px 12px 8px}
+.panel{display:none}
+.panel.on{display:block;animation:fadein .25s ease}
+@keyframes fadein{from{opacity:.2;transform:translateX(14px)}to{opacity:1;transform:none}}
+.swipehint{text-align:center;color:#64748b;font-size:12px;margin:2px 0 6px}
+</style>
+</head>
+<body>
+<div id="err"></div>
+<div class="hero">
+  <h1>🩻 اشعة</h1>
+  <p>Nutrition · Radiography · Ultrasound — Question Bank</p>
+  <p class="by">BY MOSTAFA SALLAM</p>
+</div>
+<div class="top">
+  <div class="tabs" id="tabs"></div>
+  <div class="bar"><div class="bar-in">
+    <span class="pill" id="sNum">0/0</span><span class="pill" id="sC">✅ 0</span><span class="pill" id="sW">❌ 0</span><span class="pill" id="sP">📊 0%</span>
+    <div class="pg"><i id="sFill"></i></div>
+  </div></div>
+</div>
+<div class="wrap">
+  <div class="swipehint">↔ اسحب يمين أو شمال للتنقل بين الأقسام، أو اختار من فوق</div>
+  <div id="panels"><div class="card" style="text-align:center;direction:rtl">⏳ جاري تحميل الأسئلة...<br><small>لو الرسالة دي فضلت ظاهرة يبقى الكود اتنسخ ناقص أو الصفحة مش مفتوحة من رابط github.io.</small></div></div>
+</div>
+<script>
+window.onerror=function(m,s,l){var e=document.getElementById('err');if(e){e.style.display='block';e.textContent='JS error: '+m+' (line '+l+')';}};
+var L='ABCDEFGHIJKLM'.split('');
+var TABS=[{k:'n',label:'🥗 Nutrition',sub:'Medterm'},{k:'r',label:'🩻 Radiography',sub:'Anatomy & Positioning'},{k:'u',label:'🔊 Ultrasound',sub:'Revision'}];
+var SECS={
+"ns1": {
+"tag": "✅ Part 1 · MCQ",
+"title": "Part 1: Choose the correct answer from the following: ( 10 degree\\ 1 degree for each question)"
+},
+"ns2": {
+"tag": "✔️ Part 2 · True/False",
+"title": "Part 2: Answer the following statement by marking (T/a) for right one and (F/b) for wrong one: (20degree\\ 2degree for each question)"
+},
+"ns3": {
+"tag": "🔗 Part 3 · Matching",
+"title": "Part 3: Match the following terms with each correct definition: ( degree\\ degree for each question)"
+},
+"r1": {
+"tag": "Radiography",
+"title": "Radiography & Anatomy Comprehensive Quiz"
+},
+"u1": {
+"tag": "Ultrasound",
+"title": "REVISION — Dr. Mohamed Elsheikh, MD (Consultant of Radiology)"
+}
+};
+var NSTM=[
+"The energy needed to digest and absorb food.",
+"The process of digestion and absorption of foods and the body’s use of it for growth and replacement of cells.",
+"Solid or semisolid fats at room temperature main source are animal products",
+"A condition that results from a lack of calcium in the bones",
+"The food and beverages you normally eat and drink.",
+"Foods rich in protein .These foods help to maintain life and promote growth.",
+"Disease that result from lack of vitamin C",
+"Carbohydrates, fats, protein, vitamins, minerals, and water.",
+"The building blocks of proteins",
+"The minimum energy needed by the body for vital functions when at rest and awake.",
+"Fat in the blood stream that is on its way to cell for storage",
+"Refer to Health weight",
+"A measure of the energy in food, specifically the energy yielding nutrients"
+];
+var ALL=[
+{"n":1,"s":"n","sec":"ns1","num":"1","type":"mcq","q":"Macronutrients are :","c":2,"exp":"المغذيات الكبرى (Macronutrients) هي الكربوهيدرات والبروتين والدهون.","o":["vitamins and minerals","protein and water","carbohydrate , protein and fat","lipids and protein"]},
+{"n":2,"s":"n","sec":"ns1","num":"2","type":"mcq","q":"Glucose is the only food and energy source for :","c":0,"exp":"الجلوكوز هو مصدر الطاقة الوحيد للمخ والجهاز العصبي.","o":["the brain and nervous system","bones and liver","Muscle and kidney"]},
+{"n":3,"s":"n","sec":"ns1","num":"3","type":"mcq","q":"Glycogen is stored in :","c":1,"exp":"الجليكوجين يُخزَّن في الكبد والعضلات.","o":["The brain","Liver and muscle","Kidney and bone.","Heart"]},
+{"n":4,"s":"n","sec":"ns1","num":"4","type":"mcq","q":"Fat Soluble vitamins are :","c":0,"exp":"الفيتامينات الذائبة في الدهون هي A و D و E و K.","o":["Vitamin A-D-E-K","Vitamin c+ vit B","Vitamin C +vitamin D"]},
+{"n":5,"s":"n","sec":"ns1","num":"5","type":"mcq","q":"Rickets disease is a lack of","c":0,"exp":"مرض الكساح (Rickets) ينتج عن نقص فيتامين D.","o":["Vitamin D","Vitamin C","Vitamin B complex"]},
+{"n":6,"s":"n","sec":"ns1","num":"6","type":"mcq","q":"Recommendation from protein in the healthy diet are :","c":0,"exp":"توصية البروتين في الغذاء الصحي من 15 إلى 20%.","o":["15 to 20% of the diet","25 -26% of diet","30% of diet","50% of diet"]},
+{"n":7,"s":"n","sec":"ns1","num":"7","type":"mcq","q":"Lipids contain","c":0,"exp":"الدهون (Lipids) تعطي 9 سعرات لكل جرام.","o":["9 calories per gram.","4 calories per gram.","8 calories per gram.","2 calories per gram."]},
+{"n":8,"s":"n","sec":"ns1","num":"8","type":"mcq","q":"Pellagra disease is a lack of:","c":2,"exp":"مرض البلاجرا ينتج عن نقص النياسين (Niacin).","o":["Vitamin D","Vitamin C","Niacin.","Folic acid"]},
+{"n":9,"s":"n","sec":"ns1","num":"9","type":"mcq","q":"Nutrition is assessed by :","c":3,"exp":"تقييم الحالة التغذوية يتم بالطرق المباشرة وغير المباشرة معاً.","o":["Direct method only.","Indirect method.","Subjective Global Assessment.","Direct and Indirect methods."]},
+{"n":10,"s":"n","sec":"ns1","num":"10","type":"mcq","q":"BMI 33 kg/m2 refer to","c":1,"exp":"مؤشر كتلة الجسم 33 يدل على السمنة (Obesity).","o":["Healthy weight","Obesity","Under weight","Over weight"]},
+{"n":11,"s":"n","sec":"ns1","num":"11","type":"mcq","q":"Types of carbohydrates are:","c":2,"exp":"أنواع الكربوهيدرات حسب الملف: سكريات بسيطة ومركبة وكربوهيدرات معقدة.","o":["Essential and Non- essential","Mono-saturated and poly saturated.","Simple sugars ,Compound sugars and Complex carbohydrate .","Caloric and non-caloric"]},
+{"n":12,"s":"n","sec":"ns1","num":"12","type":"mcq","q":"GO foods :","c":0,"exp":"أغذية GO هي الأغذية المعطية للطاقة.","o":["Called energy-giving foods","Called bodybuilding foods","Protective foods","Vitamin k + vitamin c"]},
+{"n":13,"s":"n","sec":"ns1","num":"13","type":"mcq","q":"Goiter Is A Reliable Sign Of :","c":2,"exp":"تضخم الغدة الدرقية (Goiter) علامة موثوقة على نقص اليود.","o":["Zinc Deficiency.","Protein Deficiency","Iodine Deficiency.","Iron Deficiency"]},
+{"n":14,"s":"n","sec":"ns1","num":"14","type":"mcq","q":"Maximum Waist Circumference For Adult Male :","c":1,"exp":"للرجال البالغين: أكبر من 94 سم زيادة في الخطر، وأكبر من 102 سم خطر كبير.","o":["> 50: > 60 cm","> 94: > 102 cm","> 120 : > 125 cm","80: > 90 cm"]},
+{"n":15,"s":"n","sec":"ns1","num":"15","type":"mcq","q":"Keep Sodium (Salt) Daily Intake:","c":0,"exp":"يُنصح بإبقاء الصوديوم (الملح) اليومي أقل من 2400 ملجم.","o":["under 2400 mg","4000 mg","over 3000 mg","over 4400 mg"]},
+{"n":16,"s":"n","sec":"ns1","num":"16","type":"mcq","q":"Spare and Thin Hair Reflect :","c":0,"exp":"الشعر الخفيف والرفيع يعكس نقص البروتين والزنك والبيوتين.","o":["Protein, Zinc, Biotin Deficiency","Vitamin B2 and Niacin Deficiency","Vitamin D Deficiency","Iodine Deficiency."]},
+{"n":17,"s":"n","sec":"ns1","num":"17","type":"mcq","q":"water Soluble vitamins are ::","c":0,"exp":"الفيتامينات الذائبة في الماء هي فيتامين C ومجموعة B.","o":["Vitamin C + vitamin B","Vitamin C + vitamin D","Vitamins A-D-E-K","Vitamin K + vitamin C"]},
+{"n":18,"s":"n","sec":"ns1","num":"18","type":"mcq","q":"CHO recommendation in diet :","c":0,"exp":"توصية الكربوهيدرات (CHO) في الغذاء حسب الملف 65%.","o":["65% of Diet","20% of Diet","30% of Diet","15% of Diet"]},
+{"n":19,"s":"n","sec":"ns1","num":"19","type":"mcq","q":"The classes of nutrients are :","c":0,"exp":"المغذيات 6 أقسام: كربوهيدرات ودهون وبروتين وفيتامينات ومعادن وماء.","o":["6 classes","8 classes","3 classes","5 classes"]},
+{"n":20,"s":"n","sec":"ns1","num":"20","type":"mcq","q":"Triglycerides and cholesterol are:","c":0,"exp":"الجلسريدات الثلاثية والكوليسترول أنواع من الدهون.","o":["Types of fats .","Types of CHO","Fibers","Amino acids"]},
+{"n":21,"s":"n","sec":"ns1","num":"21","type":"mcq","q":"Fiber recommended intake is :","c":0,"exp":"الألياف الموصى بها: 14 جم لكل 1000 سعر حراري يومياً.","o":["14g / 1000Kcals daily","5 g / 500Kcals Daily","10 g/ 2000 Kcals Daily","20 g Daily"]},
+{"n":22,"s":"n","sec":"ns1","num":"22","type":"mcq","q":"\"Spoon-shaped\" nails (Koilonychia) are a clinical sign associated with which nutritional deficiency?","c":2,"exp":"الأظافر الملعقية (Koilonychia) علامة على نقص الحديد.","o":["Vitamin A","Vitamin C","Iron","Protein"]},
+{"n":23,"s":"n","sec":"ns1","num":"23","type":"mcq","q":"What is the normal Body Mass Index (BMI) range for an adult?","c":1,"exp":"مدى BMI الطبيعي للبالغ 18.5 – 24.9.","o":["< 18.5","18.5 - 24.9","25.0 - 29.9","30.0 - 34.9"]},
+{"n":24,"s":"n","sec":"ns1","num":"24","type":"mcq","q":"How many essential amino acids must the body receive through dietary intake?","c":0,"exp":"الجسم لازم ياخد 9 أحماض أمينية أساسية من الغذاء.","o":["9","11","15","22"]},
+{"n":25,"s":"n","sec":"ns1","num":"25","type":"mcq","q":"The food category primarily responsible for repairing body tissues is :","c":0,"exp":"البروتينات هي المسؤولة أساساً عن إصلاح وبناء الأنسجة.","o":["Proteins","Vitamins","Fats","Glucose"]},
+{"n":26,"s":"n","sec":"ns1","num":"26","type":"mcq","q":"Which is considered an incomplete protein source?","c":1,"exp":"البقوليات (Legumes) مصدر بروتين غير كامل، أما البيض واللبن والسمك فبروتينها كامل.","o":["Eggs","Legumes","Milk","Fish"]},
+{"n":27,"s":"n","sec":"ns2","num":"1","type":"mcq","q":"Protein is the large class of nutrients, including sugars, starches, and fibers","c":1,"exp":"خطأ: الوصف ده للكربوهيدرات مش البروتين.","o":["True","False"]},
+{"n":28,"s":"n","sec":"ns2","num":"2","type":"mcq","q":"Fructose is a polysaccharide .","c":1,"exp":"خطأ: الفركتوز سكر أحادي (monosaccharide).","o":["True","False"]},
+{"n":29,"s":"n","sec":"ns2","num":"3","type":"mcq","q":"15% of the diet should be protein .","c":0,"exp":"صح: البروتين 15 إلى 20% من الغذاء.","o":["True","False"]},
+{"n":30,"s":"n","sec":"ns2","num":"4","type":"mcq","q":"65% of the diet should be carbohydrates","c":0,"exp":"صح (حسب الملف): الكربوهيدرات 65% من الغذاء.","o":["True","False"]},
+{"n":31,"s":"n","sec":"ns2","num":"5","type":"mcq","q":"Excess glucose is stored in the body as glycogen.","c":0,"exp":"صح: الجلوكوز الزائد يُخزَّن في الجسم كجليكوجين.","o":["True","False"]},
+{"n":32,"s":"n","sec":"ns2","num":"6","type":"mcq","q":"The body needs 30 amino acids in order to grow and develop properly.","c":1,"exp":"خطأ: العدد الأساسي اللي لازم ياخده الجسم من الغذاء 9 أحماض أمينية.","o":["True","False"]},
+{"n":33,"s":"n","sec":"ns2","num":"7","type":"mcq","q":"Most nutritionist agrees that fat intake should be 65% of our diet.","c":1,"exp":"خطأ: الـ 65% للكربوهيدرات مش الدهون.","o":["True","False"]},
+{"n":34,"s":"n","sec":"ns2","num":"8","type":"mcq","q":"Micronutrients provide energy to the body","c":1,"exp":"خطأ: المغذيات الدقيقة (فيتامينات ومعادن) لا تعطي طاقة.","o":["True","False"]},
+{"n":35,"s":"n","sec":"ns2","num":"9","type":"mcq","q":"All animal products are complete proteins","c":0,"exp":"صح حسب الملف: المنتجات الحيوانية بروتينات كاملة.","o":["True","False"]},
+{"n":36,"s":"n","sec":"ns2","num":"10","type":"mcq","q":"Foods that contain all 9 essential amino acids are incomplete proteins.","c":1,"exp":"خطأ: الأطعمة اللي فيها كل الأحماض الأمينية الأساسية التسعة بروتينات كاملة.","o":["True","False"]},
+{"n":37,"s":"n","sec":"ns2","num":"11","type":"mcq","q":"Fats contain 7 calories per gram.","c":1,"exp":"خطأ: الدهون 9 سعرات للجرام.","o":["True","False"]},
+{"n":38,"s":"n","sec":"ns2","num":"12","type":"mcq","q":"Saturated fats – solid or semisolid at room temperature","c":0,"exp":"صح: الدهون المشبعة صلبة أو شبه صلبة في درجة حرارة الغرفة.","o":["True","False"]},
+{"n":39,"s":"n","sec":"ns2","num":"13","type":"mcq","q":"Water soluble vitamins like(C and B complex) are not stored","c":0,"exp":"صح: الفيتامينات الذائبة في الماء (C و B) لا تُخزَّن في الجسم.","o":["True","False"]},
+{"n":40,"s":"n","sec":"ns2","num":"14","type":"mcq","q":"weight routinely in the morning (12 hours since eating).","c":0,"exp":"الإجابة حسب الملف: صح.","o":["True","False"]},
+{"n":41,"s":"n","sec":"ns2","num":"15","type":"mcq","q":"Female waist circumference 102cm was risky","c":0,"exp":"صح (حسب الملف): محيط الخصر 102 سم للمرأة يُعتبر خطراً.","o":["True","False"]},
+{"n":42,"s":"n","sec":"ns2","num":"16","type":"mcq","q":"Small amounts of protein at each meal is better than one large serving","c":0,"exp":"صح: كميات صغيرة من البروتين في كل وجبة أفضل من وجبة واحدة كبيرة.","o":["True","False"]},
+{"n":43,"s":"n","sec":"ns2","num":"17","type":"mcq","q":"Triglycerides are the major form of lipids","c":0,"exp":"صح: الجلسريدات الثلاثية هي الشكل الرئيسي للدهون.","o":["True","False"]},
+{"n":44,"s":"n","sec":"ns2","num":"18","type":"mcq","q":"Glycogen is stored in the brain.","c":1,"exp":"خطأ: الجليكوجين يُخزَّن في الكبد والعضلات.","o":["True","False"]},
+{"n":45,"s":"n","sec":"ns2","num":"19","type":"mcq","q":"Vitamins good source of calories","c":1,"exp":"خطأ: الفيتامينات لا تعطي سعرات حرارية.","o":["True","False"]},
+{"n":46,"s":"n","sec":"ns2","num":"20","type":"mcq","q":"Minerals inorganic substances that the body cannot manufacture.","c":0,"exp":"صح: المعادن مواد غير عضوية لا يستطيع الجسم تصنيعها.","o":["True","False"]},
+{"n":47,"s":"n","sec":"ns2","num":"21","type":"mcq","q":"BMI 20 kg/m2 refer to obesity grade 1","c":1,"exp":"خطأ: BMI = 20 وزن صحي، والسمنة تبدأ من 30.","o":["True","False"]},
+{"n":48,"s":"n","sec":"ns2","num":"22","type":"mcq","q":"Macronutrients provide energy to the body.","c":0,"exp":"صح: المغذيات الكبرى هي مصدر الطاقة.","o":["True","False"]},
+{"n":49,"s":"n","sec":"ns2","num":"23","type":"mcq","q":"Fats is the large class of nutrients, including sugars, starches, and fibers.","c":1,"exp":"خطأ: الوصف ده للكربوهيدرات مش الدهون.","o":["True","False"]},
+{"n":50,"s":"n","sec":"ns3","num":"1","type":"match","q":"Osteoporosis","c":3,"exp":"هشاشة العظام (Osteoporosis) = حالة تنتج عن نقص الكالسيوم في العظام."},
+{"n":51,"s":"n","sec":"ns3","num":"2","type":"match","q":"Termic effect of food","c":0,"exp":"التأثير الحراري للغذاء = الطاقة اللازمة لهضم وامتصاص الطعام."},
+{"n":52,"s":"n","sec":"ns3","num":"3","type":"match","q":"Nutrition","c":1,"exp":"التغذية (Nutrition) = عملية الهضم والامتصاص واستخدام الجسم للغذاء في النمو وتجديد الخلايا."},
+{"n":53,"s":"n","sec":"ns3","num":"4","type":"match","q":"Saturated fat","c":2,"exp":"الدهون المشبعة = دهون صلبة أو شبه صلبة في درجة حرارة الغرفة ومصدرها الرئيسي المنتجات الحيوانية."},
+{"n":54,"s":"n","sec":"ns3","num":"5","type":"match","q":"Diet","c":4,"exp":"النظام الغذائي (Diet) = الطعام والمشروبات التي تتناولها عادةً."},
+{"n":55,"s":"n","sec":"ns3","num":"6","type":"match","q":"Scurvy","c":6,"exp":"الاسقربوط (Scurvy) = مرض ينتج عن نقص فيتامين C."},
+{"n":56,"s":"n","sec":"ns3","num":"7","type":"match","q":"GROW foods","c":5,"exp":"أغذية GROW = أغذية غنية بالبروتين تساعد على الحفاظ على الحياة وتعزيز النمو."},
+{"n":57,"s":"n","sec":"ns3","num":"8","type":"match","q":"Amino acids","c":8,"exp":"الأحماض الأمينية = وحدات بناء البروتينات."},
+{"n":58,"s":"n","sec":"ns3","num":"9","type":"match","q":"Classes of nutrients","c":7,"exp":"أقسام المغذيات = كربوهيدرات ودهون وبروتين وفيتامينات ومعادن وماء."},
+{"n":59,"s":"n","sec":"ns3","num":"10","type":"match","q":"Basal metabolism","c":9,"exp":"الأيض الأساسي (Basal metabolism) = الحد الأدنى من الطاقة اللازمة للوظائف الحيوية أثناء الراحة واليقظة."},
+{"n":60,"s":"n","sec":"ns3","num":"11","type":"match","q":"Low Density Lipoproteins -LDL","c":10,"exp":"الـ LDL = دهون في مجرى الدم في طريقها إلى الخلايا للتخزين."},
+{"n":61,"s":"n","sec":"ns3","num":"12","type":"match","q":"Kilocalorie","c":12,"exp":"الكيلو كالوري = مقياس للطاقة في الغذاء، وبالتحديد المغذيات المعطية للطاقة."},
+{"n":62,"s":"n","sec":"ns3","num":"13","type":"match","q":"BMI = 22","c":11,"exp":"BMI = 22 يدل على وزن صحي."},
+{"n":63,"s":"r","sec":"r1","num":"1","type":"mcq","q":"The epigastric line passes approximately one inch below the:","o":["Clavicle","Xiphoid process","Axilla","Sternum's upper border"],"c":1},
+{"n":64,"s":"r","sec":"r1","num":"2","type":"mcq","q":"The plantar surface refers to the:","o":["Palm of the hand","Sole of the foot","Back of the hand","Front of the foot"],"c":1},
+{"n":65,"s":"r","sec":"r1","num":"3","type":"mcq","q":"In an AP projection, the cassette is placed:","o":["Anteriorly","Posteriorly","Above the patient","Beside the patient"],"c":1},
+{"n":66,"s":"r","sec":"r1","num":"4","type":"mcq","q":"The patient rotates approximately how many degrees for an oblique view?","o":["15°","30°","45°","90°"],"c":2},
+{"n":67,"s":"r","sec":"r1","num":"5","type":"mcq","q":"Recumbent means:","o":["Standing","Sitting","Lying down","Walking"],"c":2},
+{"n":68,"s":"r","sec":"r1","num":"6","type":"mcq","q":"Trendelenburg position means the patient lies supine with the:","o":["Head higher than the feet","Head lower than the feet","Patient standing upright","Patient lying on the abdomen"],"c":1},
+{"n":69,"s":"r","sec":"r1","num":"7","type":"mcq","q":"Axial projection follows the:","o":["Short axis of the part","Long axis of the part","Surface of the skin only","Horizontal plane only"],"c":1},
+{"n":70,"s":"r","sec":"r1","num":"8","type":"mcq","q":"Adduction means moving a part:","o":["Away from the body","Close to the body","Toward the head","Into a bent position"],"c":1},
+{"n":71,"s":"r","sec":"r1","num":"9","type":"mcq","q":"During exposure, radiological staff should stand:","o":["Beside the patient","Behind a lead partition","In front of the X-ray tube","Close to the table without protection"],"c":1},
+{"n":72,"s":"r","sec":"r1","num":"10","type":"mcq","q":"The walls and doors of the X-ray department should be isolated by:","o":["Wood only","Glass only","Lead sheets or special materials","Cotton sheets"],"c":2},
+{"n":73,"s":"r","sec":"r1","num":"11","type":"mcq","q":"What are the common indications for a chest X-ray examination?","o":["Only heart diseases","Lung diseases, pre-operative check-up, and heart diseases","Only bone fractures","Only abdominal diseases"],"c":1},
+{"n":74,"s":"r","sec":"r1","num":"12","type":"mcq","q":"During a PA chest X-ray, where should the central ray be directed?","o":["At the angle of the sternum","At the fifth dorsal vertebra","At the mid-axilla","At the lung apex"],"c":1},
+{"n":75,"s":"r","sec":"r1","num":"13","type":"mcq","q":"Which of the following is the correct patient positioning for a PA chest X-ray?","o":["Both arms raised above the head","Both hands over the lower back, with shoulders pushed anteriorly","Patient lying on one side","Patient sitting with the back against a chair"],"c":1},
+{"n":76,"s":"r","sec":"r1","num":"14","type":"mcq","q":"Which of the following is a correct criterion for assessing a good PA chest X-ray?","o":["The scapulae cover both lung fields","The trachea is displaced to one side","Both lateral costophrenic angles are clearly visible","Only the upper lung fields are included"],"c":2},
+{"n":77,"s":"r","sec":"r1","num":"15","type":"mcq","q":"In a lateral chest X-ray, which side should be in contact with the cassette when examining left lung or heart disease?","o":["Right side","Left side","Anterior side","Posterior side"],"c":1},
+{"n":78,"s":"r","sec":"r1","num":"16","type":"mcq","q":"What is the main purpose of the apical view in chest radiography?","o":["To show the heart size","To detect pleural effusion only","To demonstrate apical lesions obscured by the clavicle and upper ribs","To examine the diaphragm only"],"c":2},
+{"n":79,"s":"r","sec":"r1","num":"17","type":"mcq","q":"What is the main purpose of the lordotic view in chest radiography?","o":["To demonstrate lesions in the right middle lobe or loculated pleural effusion","To examine the cervical vertebrae","To show the lower abdominal organs","To examine the left shoulder joint"],"c":0},
+{"n":80,"s":"r","sec":"r1","num":"18","type":"mcq","q":"In chest oblique views, where should the central ray be directed?","o":["At the fifth dorsal vertebra","At the mid-axilla","At the mid-clavicular line of the side away from the film","At the angle of the mandible"],"c":2},
+{"n":81,"s":"r","sec":"r1","num":"19","type":"mcq","q":"How should the patient be positioned for a chest lateral decubitus view when pleural effusion is suspected?","o":["The affected side should be uppermost","The affected side should be down","The patient must stand upright","The patient must lie prone"],"c":1},
+{"n":82,"s":"r","sec":"r1","num":"20","type":"mcq","q":"Which technique is appropriate for chest X-rays in intensive care patients and newborns who cannot cooperate with breath-holding?","o":["Long exposure time and FFD of 180 cm","AP supine or suitable supported positioning, with short exposure time","Lordotic view in all cases","PA standing view only"],"c":1},
+{"n":83,"s":"r","sec":"r1","num":"21","type":"mcq","q":"In PA view with angle for the sternum, the Central Ray is:","o":["In the midline","10 cm para-midline at the level of the axilla, directed medially towards the sternum","On the sternal angle","On D4"],"c":1},
+{"n":84,"s":"r","sec":"r1","num":"22","type":"mcq","q":"Which view is considered the basic and most important view for the sternum?","o":["PA with angle","Oblique PA","Lateral view","AP view"],"c":2},
+{"n":85,"s":"r","sec":"r1","num":"23","type":"mcq","q":"FFD used in PA with angle and Oblique PA views of sternum is:","o":["150 cm","100 cm BUCKY used","200 cm","180 cm"],"c":1},
+{"n":86,"s":"r","sec":"r1","num":"24","type":"mcq","q":"When is AP view for upper ribs used?","o":["When there is injury to the anterior ribs","When there is injury to the posterior ribs","When there is injury to the lower ribs","Always"],"c":1},
+{"n":87,"s":"r","sec":"r1","num":"25","type":"mcq","q":"Central Ray in AP view for upper ribs is on:","o":["D4","Sternal angle (junction between manubrium and body of sternum)","Xiphoid process","Center of cassette"],"c":1},
+{"n":88,"s":"r","sec":"r1","num":"26","type":"mcq","q":"Central Ray in PA view for upper ribs is over:","o":["Sternal angle","4th dorsal vertebra","Xiphoid","D1, D2"],"c":1},
+{"n":89,"s":"r","sec":"r1","num":"27","type":"mcq","q":"In AP view for lower ribs, the cassette extends from:","o":["Shoulder to iliac crest","Below nipple down to iliac crest level","Lower neck to upper abdomen","C7 to iliac crest"],"c":1},
+{"n":90,"s":"r","sec":"r1","num":"28","type":"mcq","q":"In Oblique view of lower ribs, patient rotation is:","o":["20 degrees","30 degrees","45 degrees so that lower ribs of examined side in contact with cassette","90 degrees"],"c":2},
+{"n":91,"s":"r","sec":"r1","num":"29","type":"mcq","q":"Sternoclavicular joint is the joint between:","o":["Body of sternum and clavicle","Manubrium and both clavicles","Xiphoid and clavicles","First rib and clavicle"],"c":1},
+{"n":92,"s":"r","sec":"r1","num":"30","type":"mcq","q":"Straight PA view for sternoclavicular joint, Central Ray at:","o":["D4","D1, D2","Sternal angle","C7"],"c":1},
+{"n":93,"s":"r","sec":"r1","num":"31","type":"mcq","q":"What is the hand position for the AP elbow view?","o":["Pronated","Supinated","Perpendicular to the cassette","In a fist"],"c":1},
+{"n":94,"s":"r","sec":"r1","num":"32","type":"mcq","q":"Where is the central ray directed in the AP elbow view?","o":["5 cm above the elbow","At the wrist joint","2 cm below the humeral epicondyles","At the middle of the forearm"],"c":2},
+{"n":95,"s":"r","sec":"r1","num":"33","type":"mcq","q":"What is the FFD for the lateral elbow view?","o":["75 cm","90 cm","100 cm","150 cm"],"c":2},
+{"n":96,"s":"r","sec":"r1","num":"34","type":"mcq","q":"Where is the central ray directed in the axial elbow view?","o":["Perpendicular, 5 cm above the elbow","2 cm below the humeral epicondyles","At the radial head with a 45° angle","At the wrist joint"],"c":0},
+{"n":97,"s":"r","sec":"r1","num":"35","type":"mcq","q":"Where is the central ray directed in the AP elbow view with the forearm against the cassette?","o":["At the radial head","At the wrist","Perpendicular to the elbow","5 cm above the elbow"],"c":2},
+{"n":98,"s":"r","sec":"r1","num":"36","type":"mcq","q":"Which elbow view uses a central ray directed 2 cm below the humeral epicondyles?","o":["Axial elbow","Coyle view","AP elbow","Lateral elbow"],"c":2},
+{"n":99,"s":"r","sec":"r1","num":"37","type":"mcq","q":"What is the central ray direction for the AP forearm view?","o":["45° toward the body","Perpendicular to the middle of the forearm","5 cm above the elbow","2 cm below the humeral epicondyles"],"c":1},
+{"n":100,"s":"r","sec":"r1","num":"38","type":"mcq","q":"Which joints must be demonstrated in the AP forearm view?","o":["Shoulder and elbow joints","Elbow and wrist joints","Wrist and finger joints","Shoulder and wrist joints"],"c":1},
+{"n":101,"s":"r","sec":"r1","num":"39","type":"mcq","q":"What are the two basic views of the forearm?","o":["AP and axial","Lateral and oblique","AP and lateral","Axial and Coyle"],"c":2},
+{"n":102,"s":"r","sec":"r1","num":"40","type":"mcq","q":"In the Coyle view, the X-ray beam is directed at which angle toward the body?","o":["15°","30°","45°","90°"],"c":2},
+{"n":103,"s":"r","sec":"r1","num":"41","type":"mcq","q":"Which is a special shoulder view?","o":["Outlet view","Wrist view","Coyle view","Skull lateral"],"c":0},
+{"n":104,"s":"r","sec":"r1","num":"42","type":"mcq","q":"How much is the patient rotated for AP shoulder positioning?","o":["5–10°","15–30°","40°","45–60°"],"c":1},
+{"n":105,"s":"r","sec":"r1","num":"43","type":"mcq","q":"The central ray for AP shoulder is directed to the:","o":["Radial head","Coracoid process of scapula","Mid clavicle","Humeral epicondyles"],"c":1},
+{"n":106,"s":"r","sec":"r1","num":"44","type":"mcq","q":"In axial supero-inferior view, the beam is directed:","o":["Horizontally inferior to superior","Vertically superior to inferior toward humeral head","At 45° to radial head","To coracoid process"],"c":1},
+{"n":107,"s":"r","sec":"r1","num":"45","type":"mcq","q":"The central ray angle for outlet view is:","o":["10–15° caudal","10–15° cephalic","30° caudal","45° medial"],"c":0},
+{"n":108,"s":"r","sec":"r1","num":"46","type":"mcq","q":"What is the FFD for AP clavicle?","o":["80 cm","90 cm","100 cm","120 cm"],"c":2},
+{"n":109,"s":"r","sec":"r1","num":"47","type":"mcq","q":"For infero-superior axial clavicle view, the central ray is angled:","o":["10° caudal","15° caudal","30° cephalic","45° caudal"],"c":2},
+{"n":110,"s":"r","sec":"r1","num":"48","type":"mcq","q":"Central ray for AP humerus is directed:","o":["At humeral neck","Perpendicular to mid humeral shaft","At coracoid process","At mid clavicle"],"c":1},
+{"n":111,"s":"r","sec":"r1","num":"49","type":"mcq","q":"For AP humerus, the Bucky is:","o":["Always used","Not used","Only in obese patients","Only for fractures"],"c":1},
+{"n":112,"s":"r","sec":"r1","num":"50","type":"mcq","q":"For lateral supracondylar fracture view, patient is rotated obliquely by:","o":["15°","30°","45°","60°"],"c":2},
+{"n":113,"s":"r","sec":"r1","num":"51","type":"mcq","q":"Which of the following is listed as a special wrist view?","o":["Fan lateral","PA with ulnar deviation","Coyle view","Y view"],"c":1},
+{"n":114,"s":"r","sec":"r1","num":"52","type":"mcq","q":"Is the Bucky used for the wrist PA view?","o":["Yes","No","Only in children","Only for fractures"],"c":1},
+{"n":115,"s":"r","sec":"r1","num":"53","type":"mcq","q":"Where is the central ray directed for the wrist lateral view?","o":["Scaphoid","Radial styloid process","3rd metacarpal head","Proximal interphalangeal joint"],"c":1},
+{"n":116,"s":"r","sec":"r1","num":"54","type":"mcq","q":"Where is the central ray directed for wrist PA with ulnar deviation?","o":["Perpendicular to the scaphoid","Radial styloid process","3rd metacarpal head","Wrist dorsum between styloids"],"c":0},
+{"n":117,"s":"r","sec":"r1","num":"55","type":"mcq","q":"How is the thumb positioned for the thumb lateral view?","o":["Hand in PA position, then thumb adjusted to lateral","Hand supinated with wrist against cassette","Hand rotated 45°","Fingers separated in fan lateral"],"c":0},
+{"n":118,"s":"r","sec":"r1","num":"56","type":"mcq","q":"Where is the central ray directed for the thumb AP view, according to the lecture?","o":["Proximal interphalangeal joint","Radial styloid","3rd metacarpal head","Scaphoid"],"c":0},
+{"n":119,"s":"r","sec":"r1","num":"57","type":"mcq","q":"Where is the central ray directed for the fan lateral hand view?","o":["Perpendicular to the 2nd metacarpal head","At the scaphoid","At the radial styloid","At the 3rd metacarpal head"],"c":0},
+{"n":120,"s":"r","sec":"r1","num":"58","type":"mcq","q":"Where is the central ray directed for the finger PA view?","o":["DIP joint","PIP joint","MCP joint","Wrist joint"],"c":1},
+{"n":121,"s":"r","sec":"r1","num":"59","type":"mcq","q":"Where is the central ray directed for the finger lateral view?","o":["Perpendicular to the PIP joint","At the radial styloid","At the 3rd metacarpal head","At the scaphoid"],"c":0},
+{"n":122,"s":"r","sec":"r1","num":"60","type":"mcq","q":"In the wrist lateral view, the hand should be:","o":["Parallel to the cassette","Perpendicular to the cassette","Rotated 45 degrees","Fully supinated"],"c":1},
+{"n":123,"s":"r","sec":"r1","num":"61","type":"mcq","q":"What are the basic radiographic views of the pelvis and both hips?","o":["AP and lateral","AP and lateral oblique","PA and oblique","Axial and tangential"],"c":1},
+{"n":124,"s":"r","sec":"r1","num":"62","type":"mcq","q":"What is the correct patient position for the AP view of both hips?","o":["Prone","Standing","Supine","Lateral"],"c":2},
+{"n":125,"s":"r","sec":"r1","num":"63","type":"mcq","q":"How much should both feet be internally rotated for the AP view of both hips?","o":["5–10°","15–20°","30–40°","45°"],"c":1},
+{"n":126,"s":"r","sec":"r1","num":"64","type":"mcq","q":"Where is the central ray directed for the AP view of both hips?","o":["At the iliac crest","At the greater trochanter","5 cm above the symphysis pubis","At the knee joint"],"c":2},
+{"n":127,"s":"r","sec":"r1","num":"65","type":"mcq","q":"What is the FFD for the AP view of both hips?","o":["80 cm","90 cm","100 cm","120 cm"],"c":2},
+{"n":128,"s":"r","sec":"r1","num":"66","type":"mcq","q":"Where is the central ray directed for the AP view of a single hip?","o":["5 cm above the symphysis pubis","About 6 cm below the midpoint of a line between the ASIS and symphysis pubis","At the center of the knee","At the iliac crest"],"c":1},
+{"n":129,"s":"r","sec":"r1","num":"67","type":"mcq","q":"For the lateral oblique view of a single hip, how much is the patient turned toward the affected side?","o":["15°","30°","At least 45°","90°"],"c":2},
+{"n":130,"s":"r","sec":"r1","num":"68","type":"mcq","q":"Where is the cassette placed for the true lateral view of the hip?","o":["Under the knee","Vertically against the greater trochanter of the affected side","Under the pelvis","Behind the lumbar spine"],"c":1},
+{"n":131,"s":"r","sec":"r1","num":"69","type":"mcq","q":"What is the central ray angle for the true lateral view of the hip?","o":["10° caudal","15° cephalic","20° cephalic","25° cephalic"],"c":2},
+{"n":132,"s":"r","sec":"r1","num":"70","type":"mcq","q":"In the frog-leg lateral view of both hips, how much are the hips abducted?","o":["15°","30°","45°","90°"],"c":2},
+{"n":133,"s":"r","sec":"r1","num":"71","type":"mcq","q":"The Von Rosen position is mainly used in cases of:","o":["Femoral shaft fracture","Hip dysplasia","Coccyx injury","Sacroiliac joint inflammation"],"c":1},
+{"n":134,"s":"r","sec":"r1","num":"72","type":"mcq","q":"What is the patient position for the PA view of the sacroiliac joints?","o":["Supine","Prone","Standing","Lateral"],"c":1},
+{"n":135,"s":"r","sec":"r1","num":"73","type":"mcq","q":"What is the central ray angle for the PA view of the sacroiliac joints?","o":["10° caudal","10° cephalic","25° cephalic","20° caudal"],"c":0},
+{"n":136,"s":"r","sec":"r1","num":"74","type":"mcq","q":"What is the central ray angle for the AP view of the sacroiliac joints with cephalic angulation?","o":["10° cephalic","15° cephalic","25° cephalic","25° caudal"],"c":2},
+{"n":137,"s":"r","sec":"r1","num":"75","type":"mcq","q":"In the oblique view of the sacroiliac joint, how much is the examined side elevated?","o":["10–15°","20–25°","30–40°","45–60°"],"c":1},
+{"n":138,"s":"r","sec":"r1","num":"76","type":"mcq","q":"What is the central ray angle for the AP view of the sacrum?","o":["15° cephalic","10° caudal","25° cephalic","15° caudal"],"c":0},
+{"n":139,"s":"r","sec":"r1","num":"77","type":"mcq","q":"What is the central ray angle for the AP view of the coccyx?","o":["15° cephalic","10° caudal","25° cephalic","20° cephalic"],"c":1},
+{"n":140,"s":"r","sec":"r1","num":"78","type":"mcq","q":"What are the basic radiographic views of the femur?","o":["AP and lateral","PA and oblique","AP and axial","Lateral and tangential"],"c":0},
+{"n":141,"s":"r","sec":"r1","num":"79","type":"mcq","q":"How much is the leg internally rotated for the AP view of the femur?","o":["5°","10°","15°","45°"],"c":2},
+{"n":142,"s":"r","sec":"r1","num":"80","type":"mcq","q":"Where is the central ray directed for the lateral view of the femur?","o":["At the middle of the cassette","At the knee joint","At the greater trochanter","At the iliac crest"],"c":0},
+{"n":143,"s":"u","sec":"u1","num":"1","type":"mcq","q":"Ultrasound is defined as sound with a frequency greater than:","o":["20 Hz","2,000 Hz","20,000 Hz","200,000 Hz"],"c":2},
+{"n":144,"s":"u","sec":"u1","num":"2","type":"mcq","q":"Which frequency range is typical for diagnostic ultrasound?","o":["20 to 20,000 Hz","1 to 20 MHz","50 to 100 MHz","20 to 200 kHz"],"c":1},
+{"n":145,"s":"u","sec":"u1","num":"3","type":"mcq","q":"The speed of ultrasound in soft tissue at 37°C is about:","o":["330 m/s","960 m/s","1,200 m/s","1,540 m/s"],"c":3},
+{"n":146,"s":"u","sec":"u1","num":"4","type":"mcq","q":"SONAR stands for:","o":["Sound navigation ranging","Sound navigation and radiation","Sonic non-acoustic ranging","Sound node analysis and reflection"],"c":0},
+{"n":147,"s":"u","sec":"u1","num":"5","type":"mcq","q":"Why is ultrasound the preferred modality in obstetrics?","o":["It penetrates bone better than other modalities","It does not use ionizing radiation","It needs no transducer","It produces only still images"],"c":1},
+{"n":148,"s":"u","sec":"u1","num":"6","type":"mcq","q":"The piezoelectric crystals in a transducer:","o":["Dampen the vibrations of the probe","Store patient images","Convert electrical energy into sound waves and echoes back into electrical energy","Protect the internal components of the probe"],"c":2},
+{"n":149,"s":"u","sec":"u1","num":"7","type":"mcq","q":"The function of the matching layer is to:","o":["Improve the transmission of sound into the body","Dampen crystal vibrations","Amplify returning echoes","Convert analog signals to digital"],"c":0},
+{"n":150,"s":"u","sec":"u1","num":"8","type":"mcq","q":"The backing material of the transducer:","o":["Focuses the beam on deep organs","Stores the images","Generates the ultrasound pulse","Dampens the vibrations of the piezoelectric crystals"],"c":3},
+{"n":151,"s":"u","sec":"u1","num":"9","type":"mcq","q":"The pulser:","o":["Amplifies and processes returning echoes","Sends electrical pulses to the transducer to create sound waves","Converts the processed signals into a visual image","Stores images and patient data"],"c":1},
+{"n":152,"s":"u","sec":"u1","num":"10","type":"mcq","q":"The processor (scan converter) is responsible for:","o":["Storing patient data","Amplifying returning echoes","Converting analog signals to digital signals","Generating the sound pulse"],"c":2},
+{"n":153,"s":"u","sec":"u1","num":"11","type":"mcq","q":"B-mode (grayscale) imaging displays:","o":["The brightness of returning echoes to show anatomical structures","The speed and direction of blood flow","Only moving structures along a single line","Blood flow as color overlays only"],"c":0},
+{"n":154,"s":"u","sec":"u1","num":"12","type":"mcq","q":"Doppler imaging assesses blood flow by measuring:","o":["The brightness of reflected echoes","The thickness of the vessel wall","The temperature of the tissue","The change in frequency of sound waves reflected from moving red blood cells"],"c":3},
+{"n":155,"s":"u","sec":"u1","num":"13","type":"mcq","q":"High-frequency transducers (10–15 MHz) are best suited for:","o":["Deep abdominal structures","Superficial structures, because of excellent resolution but limited depth","Deep structures, because of better penetration","Cardiac imaging only"],"c":1},
+{"n":156,"s":"u","sec":"u1","num":"14","type":"mcq","q":"Which statement about frequency and penetration is correct?","o":["Higher frequency penetrates deeper","Frequency does not affect penetration","Lower frequency penetrates deeper","Attenuation is inversely related to frequency"],"c":2},
+{"n":157,"s":"u","sec":"u1","num":"15","type":"mcq","q":"Compared with a 3 MHz transducer, a 12 MHz transducer has:","o":["Very good resolution but cannot penetrate very deep","Poorer resolution but deeper penetration","Both poorer resolution and poorer penetration","Identical resolution and penetration"],"c":0},
+{"n":158,"s":"u","sec":"u1","num":"16","type":"mcq","q":"Which transducer is known as the \"abdominal probe\"?","o":["Linear array","Phased array","Linear and phased arrays equally","Convex (curvilinear) array"],"c":3},
+{"n":159,"s":"u","sec":"u1","num":"17","type":"mcq","q":"Which pairing of transducer and use is correct?","o":["Linear: cardiac probe","Phased array: cardiac probe; linear: vascular probe","Convex: vascular probe","Phased array: abdominal probe"],"c":1},
+{"n":160,"s":"u","sec":"u1","num":"18","type":"mcq","q":"Which frequency is most appropriate for scanning a large patient?","o":["High frequency, for better resolution","Any frequency, since size does not matter","Low frequency, for deeper penetration","High frequency, for deeper penetration"],"c":2},
+{"n":161,"s":"u","sec":"u1","num":"19","type":"mcq","q":"In the sagittal plane, the probe indicator points toward the patient's:","o":["Head","Right side","Left side","Feet"],"c":0},
+{"n":162,"s":"u","sec":"u1","num":"20","type":"mcq","q":"In the transverse plane, the probe indicator points toward the patient's:","o":["Head","Feet","Left side","Right side"],"c":3},
+{"n":163,"s":"u","sec":"u1","num":"21","type":"mcq","q":"Gain is the strength of the returning echoes. A common error among novices is:","o":["Under-gaining the image","Over-gaining the image","Setting the depth too shallow","Using too low a frequency"],"c":1},
+{"n":164,"s":"u","sec":"u1","num":"22","type":"mcq","q":"A structure that is less echogenic than the surrounding tissue is described as:","o":["Hyperechoic","Anechoic","Hypoechoic","Devoid of echoes"],"c":2},
+{"n":165,"s":"u","sec":"u1","num":"23","type":"mcq","q":"Posterior acoustic enhancement occurs when sound passes through:","o":["Low-attenuating tissue, which enhances echoes behind it","High-attenuating tissue, which diminishes echoes behind it","Gas, which scatters the beam","A boundary between tissues of equal propagation speed"],"c":0},
+{"n":166,"s":"u","sec":"u1","num":"24","type":"mcq","q":"Which artifact appears as recurrent bright arcs at equidistant intervals from the transducer?","o":["Refraction","Gas scatter","Acoustic shadowing","Reverberation"],"c":3},
+{"n":167,"s":"u","sec":"u1","num":"25","type":"mcq","q":"Which structures are examined through the intercostal approach in the lecture?","o":["Left lobe of the liver and pancreas","Gallbladder and portal vein","Urinary bladder and prostate","Appendix and colon"],"c":1},
+{"n":168,"s":"u","sec":"u1","num":"26","type":"mcq","q":"The right flank window is used to scan the:","o":["Spleen","Pancreas","Right kidney","Appendix"],"c":2},
+{"n":169,"s":"u","sec":"u1","num":"27","type":"mcq","q":"The left upper quadrant window is used to scan the:","o":["Spleen","Urinary bladder","Appendix","Gallbladder"],"c":0},
+{"n":170,"s":"u","sec":"u1","num":"28","type":"mcq","q":"The right iliac fossa window is used to look for the:","o":["Right kidney","Aorta","Spleen","Appendix"],"c":3},
+{"n":171,"s":"u","sec":"u1","num":"29","type":"mcq","q":"The retroperitoneal view is used to visualize:","o":["The urinary bladder and ovaries","The IVC and aorta","The gallbladder","The left kidney only"],"c":1},
+{"n":172,"s":"u","sec":"u1","num":"30","type":"mcq","q":"In the female pelvic window, which structures are scanned?","o":["Pancreas and spleen","Right kidney and liver","Urinary bladder, uterus and ovaries","Appendix and small bowel"],"c":2},
+{"n":173,"s":"u","sec":"u1","num":"31","type":"mcq","q":"In the peritoneal cavity view, what is the typical finding highlighted?","o":["Ascites (free fluid)","Haustration","A normal appendix","The hepatic vein"],"c":0},
+{"n":174,"s":"u","sec":"u1","num":"32","type":"mcq","q":"Haustration is a feature of the:","o":["Small bowel","Gallbladder","Pancreas","Normal colon"],"c":3},
+{"n":175,"s":"u","sec":"u1","num":"33","type":"mcq","q":"The subcostal sweep is used to demonstrate the:","o":["Right kidney only","Right lobe of the liver, the gallbladder (short axis) and the portal vein","Urinary bladder","Appendix"],"c":1},
+{"n":176,"s":"u","sec":"u1","num":"34","type":"mcq","q":"The longitudinal plane corresponds to the:","o":["Transverse plane","Coronal plane only","Long axis of the body","Short axis of the gallbladder"],"c":2},
+{"n":177,"s":"u","sec":"u1","num":"35","type":"mcq","q":"Which is NOT listed as a clinical application of small parts ultrasound?","o":["Scrotum","Salivary glands","Breast","Liver"],"c":3},
+{"n":178,"s":"u","sec":"u1","num":"36","type":"mcq","q":"On ultrasound, the normal thyroid appears:","o":["Fine and homogeneous, more echogenic than the adjacent muscles","Anechoic, with posterior enhancement","Hypoechoic compared with the adjacent muscles","Heterogeneous, with multiple calcifications"],"c":0},
+{"n":179,"s":"u","sec":"u1","num":"37","type":"mcq","q":"The average size of each thyroid lobe is:","o":["Length 1–2 cm, AP 4–5 cm","Length 4–5 cm, AP 1.5–2.5 cm","Length 8–10 cm, AP 5 cm","Length 2 cm, AP 2 cm"],"c":1},
+{"n":180,"s":"u","sec":"u1","num":"38","type":"mcq","q":"Which is a risk factor for malignant transformation of a thyroid nodule?","o":["Old age","Female gender","Prior radiation exposure","A soft, mobile nodule"],"c":2},
+{"n":181,"s":"u","sec":"u1","num":"39","type":"mcq","q":"Which ultrasound feature suggests malignancy?","o":["Anechoic echogenicity","Peripheral vascularity","Presence of a halo sign","Hypoechogenicity"],"c":3},
+{"n":182,"s":"u","sec":"u1","num":"40","type":"mcq","q":"The halo sign (a hypoechoic or anechoic rim around the nodule) suggests:","o":["Benignity when present, and malignancy when absent","Malignancy when present","A cyst, whether present or absent","Thyroiditis"],"c":0},
+{"n":183,"s":"u","sec":"u1","num":"41","type":"mcq","q":"Which calcification pattern suggests malignancy?","o":["Peripheral \"egg-shell\" calcification","Punctate echogenic foci without acoustic shadowing","Large coarse calcification with shadowing","No calcification"],"c":1},
+{"n":184,"s":"u","sec":"u1","num":"42","type":"mcq","q":"Regarding nodule composition:","o":["Completely solid suggests benignity","Composition is not useful","Not completely solid (cystic or septated) suggests benignity, and completely solid suggests malignancy","Cystic composition suggests malignancy"],"c":2},
+{"n":185,"s":"u","sec":"u1","num":"43","type":"mcq","q":"Which vascularity pattern suggests a malignant nodule?","o":["Peripheral vascularity","Absent flow only","Reduced flow in the surrounding gland","Intranodal vascularity"],"c":3},
+{"n":186,"s":"u","sec":"u1","num":"44","type":"mcq","q":"In the Doppler classification of nodular lesions, Type II means:","o":["Peri-nodular blood flow","Absence of blood flow","Mild intra-nodular blood flow","Marked intra-nodular blood flow"],"c":0},
+{"n":187,"s":"u","sec":"u1","num":"45","type":"mcq","q":"In the TI-RADS system shown, a total of 7 points or more corresponds to:","o":["TR1 (benign)","TR5 (highly suspicious)","TR2 (not suspicious)","TR3 (mildly suspicious)"],"c":1},
+{"n":188,"s":"u","sec":"u1","num":"46","type":"mcq","q":"Regarding goitre:","o":["It always causes hyperthyroidism","It means shrinkage of the gland","Euthyroid goitre is the most common type, and iodine deficiency is usually the cause","It never occurs in physiologic states such as pregnancy"],"c":2},
+{"n":189,"s":"u","sec":"u1","num":"47","type":"mcq","q":"Adenomatous (colloid) nodules are:","o":["True malignant neoplasms","Rare solid tumors","Hot nodules with no cystic change","The most common type of thyroid nodule, representing zones of hyperplasia with cystic components"],"c":3},
+{"n":190,"s":"u","sec":"u1","num":"48","type":"mcq","q":"How can a small solid adenoma be distinguished from a cyst?","o":["A solid lesion will not show posterior acoustic enhancement","A solid lesion always shows posterior acoustic enhancement","A solid lesion is always anechoic","They cannot be distinguished by ultrasound"],"c":0},
+{"n":191,"s":"u","sec":"u1","num":"49","type":"mcq","q":"A thyroid cyst on ultrasound is typically:","o":["Hyperechoic with posterior shadowing","Round or oval, anechoic, with increased through-transmission and edge shadowing","Irregular and solid","Hypoechoic with intranodal flow"],"c":1},
+{"n":192,"s":"u","sec":"u1","num":"50","type":"mcq","q":"Thyroiditis on ultrasound typically shows:","o":["A small gland with increased echogenicity","A solitary well-defined hyperechoic mass","A diffusely enlarged gland with decreased echogenicity and a heterogeneous pattern","A purely anechoic gland"],"c":2}
+];
+var act='n',ST={};
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function byN(n){for(var i=0;i<ALL.length;i++)if(ALL[i].n==n)return ALL[i];return null}
+function opts(q){return q.type==='match'?NSTM:q.o}
+function ctext(q){return L[q.c]+') '+opts(q)[q.c]}
+function buildPanels(){
+  var tb='',pn='';
+  TABS.forEach(function(t){
+    ST[t.k]={res:{},qs:ALL.filter(function(q){return q.s===t.k})};
+    tb+='<button type="button" class="tab" data-tab="'+t.k+'">'+t.label+'<small>'+ST[t.k].qs.length+' سؤال</small></button>';
+    pn+='<section class="panel" id="p_'+t.k+'"><div id="cards_'+t.k+'"></div>'+
+      '<button class="btn sbtn" data-sub="'+t.k+'" id="sub_'+t.k+'" disabled>عرض نتيجة القسم 🎯</button>'+
+      '<div class="resbox" id="result_'+t.k+'" style="display:none"></div></section>';
+  });
+  $('tabs').innerHTML=tb;$('panels').innerHTML=pn;
+  TABS.forEach(function(t){renderCards(t.k)});
+}
+function renderCards(k){
+  var h='',last='';
+  ST[k].qs.forEach(function(q){
+    if(q.sec!==last){last=q.sec;h+='<div class="sec">'+esc(SECS[q.sec].title)+'</div>';}
+    h+='<div class="card" id="c'+q.n+'"><div class="qh"><span class="qn">'+esc(q.num)+'</span><span class="tag">'+esc(SECS[q.sec].tag)+'</span></div>';
+    h+='<div class="qt">'+esc(q.q)+'</div>';
+    if(q.type==='match'){
+      h+='<div class="hint">اختر التعريف الصحيح لهذا المصطلح</div><select class="inp" id="sel'+q.n+'"><option value="">— اختر —</option>'+NSTM.map(function(s,i){return '<option value="'+i+'">'+L[i]+'. '+esc(s)+'</option>'}).join('')+'</select>';
+      h+='<div class="btns"><button type="button" class="btn" data-act="mcheck" data-n="'+q.n+'">تحقق ✔</button></div>';
+    }else{
+      h+='<div class="opts">';
+      q.o.forEach(function(o,i){h+='<button type="button" class="opt" data-act="opt" data-n="'+q.n+'" data-i="'+i+'"><b>'+L[i]+'</b><span>'+esc(o)+'</span></button>'});
+      h+='</div>';
+    }
+    h+='<div class="fb" id="fb'+q.n+'"></div></div>';
+  });
+  $('cards_'+k).innerHTML=h;
+}
+function updateBar(){
+  var s=ST[act],total=s.qs.length,done=0,c=0;
+  for(var x in s.res){done++;if(s.res[x])c++;}
+  $('sNum').textContent=done+'/'+total;$('sC').textContent='✅ '+c;$('sW').textContent='❌ '+(done-c);
+  $('sP').textContent='📊 '+(done?Math.round(c/done*100):0)+'%';
+  $('sFill').style.width=(total?done/total*100:0)+'%';
+  $('sub_'+act).disabled=done<1;
+}
+function setTab(k,noScroll){
+  act=k;
+  var ts=document.querySelectorAll('.tab');
+  for(var i=0;i<ts.length;i++)ts[i].classList.toggle('on',ts[i].getAttribute('data-tab')===k);
+  TABS.forEach(function(t){var p=$('p_'+t.k);if(t.k===k)p.classList.add('on');else p.classList.remove('on')});
+  updateBar();
+  if(!noScroll)window.scrollTo(0,0);
+}
+function move(d){
+  var i=0;TABS.forEach(function(t,j){if(t.k===act)i=j});
+  var j=i+d;if(j<0||j>=TABS.length)return;
+  setTab(TABS[j].k);
+}
+function answer(q,i,ok){
+  var s=ST[q.s];s.res[q.n]=ok;
+  var card=$('c'+q.n);card.className='card '+(ok?'ok':'no');
+  var fb=$('fb'+q.n);fb.className='fb '+(ok?'ok':'no');fb.style.display='block';
+  fb.innerHTML=(ok?'✅ إجابة صحيحة!':'❌ الإجابة الصحيحة: <b dir="ltr">'+esc(ctext(q))+'</b>')+(q.exp?'<div dir="rtl" style="margin-top:6px">'+esc(q.exp)+'</div>':'');
+  updateBar();
+}
+function showResults(k){
+  var s=ST[k],done=0,c=0;
+  s.qs.forEach(function(q){if(s.res[q.n]!==undefined){done++;if(s.res[q.n])c++;}});
+  var p=done?Math.round(c/done*100):0,left=s.qs.length-done;
+  var msg=(p>=90?'ممتاز! مستواك رائع 🌟':p>=75?'جيد جداً، كمّل كده 👏':p>=50?'مستوى كويس، راجع الأخطاء وهتتحسن 💪':'محتاج مراجعة أكتر، ذاكر وجرّب تاني 📚')+(left?'  (لسه فاضل '+left+' سؤال بدون إجابة)':'');
+  var h='<div id="result" style="display:block"><h2>🎉 النتيجة</h2><div class="big">'+c+' / '+done+'</div><div>'+msg+'</div>';
+  h+='<div class="stats"><div class="stat c">✅ صح<br>'+c+'</div><div class="stat w">❌ غلط<br>'+(done-c)+'</div><div class="stat p">📊 النسبة<br>'+p+'%</div></div>';
+  h+='<div class="btns" style="justify-content:center"><button class="btn" data-again="'+k+'">🔄 إعادة القسم</button><button class="btn gh" data-top="1">🏠 للأعلى</button></div>';
+  var wr=s.qs.filter(function(q){return s.res[q.n]===false});
+  h+='<div class="rev">'+(wr.length?'<h3>📝 مراجعة الأسئلة الغلط ('+wr.length+')</h3>'+wr.map(function(q){return '<div class="ri"><div class="q">'+esc(SECS[q.sec].tag)+' — Q'+esc(q.num)+': '+esc(q.q)+'</div><div>✅ <b dir="ltr">'+esc(ctext(q))+'</b></div></div>'}).join(''):'<h3>🎯 كل إجاباتك صح!</h3>')+'</div></div>';
+  var box=$('result_'+k);box.innerHTML=h;box.style.display='block';box.scrollIntoView();
+}
+function resetTab(k){
+  ST[k].res={};renderCards(k);$('result_'+k).style.display='none';updateBar();window.scrollTo(0,0);
+}
+function onClick(e){
+  var b=e.target;
+  while(b&&b!==document&&!(b.getAttribute&&(b.getAttribute('data-act')||b.getAttribute('data-tab')||b.getAttribute('data-sub')||b.getAttribute('data-again')||b.getAttribute('data-top'))))b=b.parentNode;
+  if(!b||b===document)return;
+  var t=b.getAttribute('data-tab');if(t){setTab(t);return}
+  var sb=b.getAttribute('data-sub');if(sb){showResults(sb);return}
+  var ag=b.getAttribute('data-again');if(ag){resetTab(ag);return}
+  if(b.getAttribute('data-top')){window.scrollTo(0,0);return}
+  var q=byN(b.getAttribute('data-n'));
+  if(!q||ST[q.s].res[q.n]!==undefined)return;
+  var act2=b.getAttribute('data-act');
+  if(act2==='opt'){
+    var i=+b.getAttribute('data-i'),bs=$('c'+q.n).querySelectorAll('.opt');
+    for(var j=0;j<bs.length;j++){var x=+bs[j].getAttribute('data-i');if(x===q.c)bs[j].classList.add('right');else if(x===i)bs[j].classList.add('bad');bs[j].disabled=true;}
+    answer(q,i,i===q.c);
+  }else if(act2==='mcheck'){
+    var sl=$('sel'+q.n);if(!sl.value)return;
+    var ok=(+sl.value===q.c);sl.className='inp '+(ok?'ok':'no');sl.disabled=true;b.disabled=true;answer(q,+sl.value,ok);
+  }
+}
+var tx=0,ty=0,tt=0,tok=false;
+function ts(e){var t=e.changedTouches[0];tx=t.clientX;ty=t.clientY;tt=Date.now();var n=e.target&&e.target.tagName;tok=!(n==='SELECT'||n==='INPUT'||n==='OPTION')}
+function te(e){
+  if(!tok)return;var t=e.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;
+  if(Math.abs(dx)>70&&Math.abs(dx)>2*Math.abs(dy)&&Date.now()-tt<900)move(dx<0?1:-1);
+}
+function init(){
+  buildPanels();
+  document.addEventListener('click',onClick);
+  document.addEventListener('touchstart',ts,{passive:true});
+  document.addEventListener('touchend',te,{passive:true});
+  document.addEventListener('keydown',function(e){var n=e.target&&e.target.tagName;if(n==='INPUT'||n==='SELECT')return;if(e.key==='ArrowRight')move(1);else if(e.key==='ArrowLeft')move(-1)});
+  setTab('n',true);
+}
+init();
+</script>
+</body>
+</html>
